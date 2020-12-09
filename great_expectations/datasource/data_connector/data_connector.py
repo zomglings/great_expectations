@@ -252,17 +252,20 @@ class DataConnector:
         # _execution_engine might be None for some tests
         if batch_definition is None or self._execution_engine is None:
             return {}
+
         batch_data, batch_spec, _ = self.get_batch_data_and_metadata(batch_definition)
 
-        df = batch_data.execution_engine.resolve_metrics(
-            (
-                MetricConfiguration(
-                    "table.head", {"batch_id": batch_definition.id}, {"n_rows": 5}
-                ),
+        # Note: get_batch_data_and_metadata will have loaded the data into the currently-defined execution engine.
+        # Consequently, when we build a Validator, we do not need to specifically load the batch into it to
+        # resolve metrics.
+        validator = Validator(execution_engine=batch_data.execution_engine)
+        df = validator.get_metric(
+            MetricConfiguration(
+                "table.head", {"batch_id": batch_definition.id}, {"n_rows": 5}
             )
         )
-        n_rows = batch_data.execution_engine.resolve_metrics(
-            (MetricConfiguration("table.row_count", {"batch_id": batch_definition.id}),)
+        n_rows = validator.get_metric(
+            MetricConfiguration("table.row_count", {"batch_id": batch_definition.id})
         )
 
         if pretty_print and df is not None:

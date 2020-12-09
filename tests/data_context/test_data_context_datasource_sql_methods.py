@@ -78,8 +78,8 @@ def test_get_batch(data_context_with_sql_datasource_for_testing_get_batch):
         )
 
     # Failed specification using an incomplete BatchRequest
-    # with pytest.raises(ValueError):
-    with pytest.raises(KeyError):
+    # with pytest.raises(KeyError):
+    with pytest.raises(ValueError):
         context.get_batch(
             batch_request=BatchRequest(
                 # datasource_name=MISSING
@@ -200,8 +200,8 @@ def test_get_validator(data_context_with_sql_datasource_for_testing_get_batch):
         )
 
     # Failed specification using an incomplete BatchRequest
-    # with pytest.raises(ValueError):
-    with pytest.raises(KeyError):
+    # with pytest.raises(KeyError):
+    with pytest.raises(ValueError):
         context.get_validator(
             batch_request=BatchRequest(
                 # datasource_name=MISSING
