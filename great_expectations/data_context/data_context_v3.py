@@ -18,6 +18,7 @@ from great_expectations.data_context.util import (
     substitute_all_config_variables,
 )
 from great_expectations.datasource.new_datasource import Datasource
+from great_expectations.exceptions import DataContextError
 from great_expectations.validator.validator import Validator
 
 logger = logging.getLogger(__name__)
@@ -321,7 +322,9 @@ class DataContextV3(DataContext):
         else:
             datasource_name = datasource_name
 
-        datasource: Datasource = cast(Datasource, self.datasources[datasource_name])
+        datasource = self.get_datasource(datasource_name)
+        if not datasource:
+            raise DataContextError(f"Unable to locate datasource {datasource_name}")
 
         if batch_request:
             # TODO: Raise a warning if any parameters besides batch_requests are specified
