@@ -23,7 +23,8 @@ from ..exceptions import (
 )
 from ..expectations.row_conditions import parse_condition_to_spark
 from ..validator.validation_graph import MetricConfiguration
-from .execution_engine import BatchData, ExecutionEngine, MetricDomainTypes
+from .execution_engine import ExecutionEngine, MetricDomainTypes
+from .sparkdf_batch_data import SparkDFBatchData
 
 logger = logging.getLogger(__name__)
 
@@ -58,16 +59,6 @@ except ImportError:
     logger.debug(
         "Unable to load pyspark; install optional spark dependency for support."
     )
-
-
-class SparkDFBatchData(BatchData):
-    def __init__(self, execution_engine, dataframe):
-        super().__init__(execution_engine)
-        self._dataframe = dataframe
-
-    @property
-    def dataframe(self):
-        return self._dataframe
 
 
 class SparkDFExecutionEngine(ExecutionEngine):
@@ -182,7 +173,18 @@ This class holds an attribute `spark_df` which is a spark.sql.DataFrame.
                 "Batch has not been loaded - please run load_batch() to load a batch."
             )
 
-        return self.active_batch_data
+        return self.active_batch_data.dataframe
+
+    def load_batch_data(self, batch_id: str, batch_data: Any) -> None:
+        if isinstance(batch_data, DataFrame):
+            batch_data = SparkDFBatchData(self, batch_data)
+        elif isinstance(batch_data, SparkDFBatchData):
+            pass
+        else:
+            raise GreatExpectationsError(
+                "SparkDFExecutionEngine requires batch data that is either a DataFrame or a SparkDFBatchData object"
+            )
+        super().load_batch_data(batch_id=batch_id, batch_data=batch_data)
 
     def get_batch_data_and_markers(
         self, batch_spec: BatchSpec

@@ -13,7 +13,7 @@ try:
 except ImportError:
     spark_DataFrame = type(None)
 
-from great_expectations.execution_engine.sqlalchemy_execution_engine import (
+from great_expectations.execution_engine.sqlalchemy_batch_data import (
     SqlAlchemyBatchData,
 )
 from tests.conftest import build_test_backends_list_cfe

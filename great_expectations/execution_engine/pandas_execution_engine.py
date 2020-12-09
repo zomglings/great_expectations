@@ -4,7 +4,7 @@ import hashlib
 import logging
 import random
 from functools import partial
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
 
 import pandas as pd
 from ruamel.yaml.compat import StringIO
@@ -17,6 +17,8 @@ from great_expectations.datasource.types import (
 )
 from great_expectations.datasource.util import S3Url
 
+from .pandas_batch_data import PandasBatchData
+
 try:
     import boto3
 except ImportError:
@@ -26,21 +28,11 @@ from ..core.batch import BatchMarkers
 from ..core.id_dict import BatchSpec
 from ..datasource.util import hash_pandas_dataframe
 from ..exceptions import BatchSpecError, GreatExpectationsError, ValidationError
-from .execution_engine import BatchData, ExecutionEngine, MetricDomainTypes
+from .execution_engine import ExecutionEngine, MetricDomainTypes
 
 logger = logging.getLogger(__name__)
 
 HASH_THRESHOLD = 1e9
-
-
-class PandasBatchData(BatchData):
-    def __init__(self, execution_engine, dataframe: pd.DataFrame):
-        super().__init__(execution_engine=execution_engine)
-        self._dataframe = dataframe
-
-    @property
-    def dataframe(self):
-        return self._dataframe
 
 
 class PandasExecutionEngine(ExecutionEngine):
@@ -106,6 +98,17 @@ Notes:
     def configure_validator(self, validator):
         super().configure_validator(validator)
         validator.expose_dataframe_methods = True
+
+    def load_batch_data(self, batch_id: str, batch_data: Any) -> None:
+        if isinstance(batch_data, pd.DataFrame):
+            batch_data = PandasBatchData(self, batch_data)
+        elif isinstance(batch_data, PandasBatchData):
+            pass
+        else:
+            raise GreatExpectationsError(
+                "PandasExecutionEngine requires batch data that is either a DataFrame or a PandasBatchData object"
+            )
+        super().load_batch_data(batch_id=batch_id, batch_data=batch_data)
 
     def get_batch_data_and_markers(
         self, batch_spec: BatchSpec
@@ -195,7 +198,7 @@ Notes:
                 "Batch has not been loaded - please run load_batch_data() to load a batch."
             )
 
-        return self.active_batch_data
+        return self.active_batch_data.dataframe
 
     def _get_reader_fn(self, reader_method=None, path=None):
         """Static helper for parsing reader types. If reader_method is not provided, path will be used to guess the

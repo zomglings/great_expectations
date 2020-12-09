@@ -235,7 +235,7 @@ class DatasetProfiler(DataAssetProfiler):
         elif isinstance(data_asset, Batch):
             validation_results = Validator(
                 execution_engine=data_asset.data.execution_engine, batches=[data_asset]
-            )
+            ).validate(expectation_suite, run_id=run_id, result_format="SUMMARY")
         else:
             batch_kwargs = data_asset.batch_kwargs
 

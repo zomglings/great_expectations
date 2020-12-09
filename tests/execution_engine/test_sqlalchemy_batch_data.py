@@ -6,8 +6,7 @@ try:
 except ImportError:
     sqlalchemy = None
 
-
-from great_expectations.execution_engine.sqlalchemy_execution_engine import (
+from great_expectations.execution_engine.sqlalchemy_batch_data import (
     SqlAlchemyBatchData,
 )
 

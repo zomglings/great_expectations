@@ -27,6 +27,9 @@ class NoOpDict:
     def __setitem__(self, key, value):
         return None
 
+    def update(self, value):
+        return None
+
 
 class BatchData:
     def __init__(self, execution_engine):
@@ -192,7 +195,7 @@ class ExecutionEngine(ABC):
                 elif self._caching and v.id in self._metric_cache:
                     metric_dependencies[k] = self._metric_cache[v.id]
                 else:
-                    raise GreatExpectationsError(f"Missing metric dependency: {str(e)}")
+                    raise GreatExpectationsError(f"Missing metric dependency: {str(k)}")
             metric_provider_kwargs = {
                 "cls": metric_class,
                 "execution_engine": self,
@@ -254,8 +257,7 @@ class ExecutionEngine(ABC):
             resolved_metrics.update(self.resolve_metric_bundle(metric_fn_bundle))
 
         if self._caching:
-            cache_update = copy.deepcopy(resolved_metrics)
-            self._metric_cache.update(cache_update)
+            self._metric_cache.update(resolved_metrics)
 
         return resolved_metrics
 

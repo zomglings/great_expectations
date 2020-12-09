@@ -7,7 +7,7 @@ from ruamel.yaml import YAML
 from great_expectations.core.batch import Batch, BatchRequest, PartitionRequest
 from great_expectations.datasource.new_datasource import Datasource
 from great_expectations.exceptions.exceptions import DataContextError
-from great_expectations.execution_engine.sqlalchemy_execution_engine import (
+from great_expectations.execution_engine.sqlalchemy_batch_data import (
     SqlAlchemyBatchData,
 )
 from great_expectations.marshmallow__shade.exceptions import ValidationError
