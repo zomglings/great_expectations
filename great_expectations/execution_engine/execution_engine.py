@@ -177,6 +177,7 @@ class ExecutionEngine(ABC):
         """
         if metrics is None:
             metrics = dict()
+
         resolved_metrics = dict()
 
         metric_fn_bundle = []
@@ -184,13 +185,14 @@ class ExecutionEngine(ABC):
             metric_class, metric_fn = get_metric_provider(
                 metric_name=metric_to_resolve.metric_name, execution_engine=self
             )
-            try:
-                metric_dependencies = {
-                    k: metrics[v.id]
-                    for k, v in metric_to_resolve.metric_dependencies.items()
-                }
-            except KeyError as e:
-                raise GreatExpectationsError(f"Missing metric dependency: {str(e)}")
+            metric_dependencies = dict()
+            for k, v in metric_to_resolve.metric_dependencies.items():
+                if v.id in metrics:
+                    metric_dependencies[k] = metrics[v.id]
+                elif self._caching and v.id in self._metric_cache:
+                    metric_dependencies[k] = self._metric_cache[v.id]
+                else:
+                    raise GreatExpectationsError(f"Missing metric dependency: {str(e)}")
             metric_provider_kwargs = {
                 "cls": metric_class,
                 "execution_engine": self,
@@ -250,6 +252,10 @@ class ExecutionEngine(ABC):
                 )
         if len(metric_fn_bundle) > 0:
             resolved_metrics.update(self.resolve_metric_bundle(metric_fn_bundle))
+
+        if self._caching:
+            cache_update = copy.deepcopy(resolved_metrics)
+            self._metric_cache.update(cache_update)
 
         return resolved_metrics
 
