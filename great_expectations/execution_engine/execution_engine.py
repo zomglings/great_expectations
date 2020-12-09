@@ -148,7 +148,7 @@ class ExecutionEngine(ABC):
         """
         Loads the specified batch_data into the execution engine
         """
-        self._batch_data_dict[batch_id] = self._get_typed_batch_data(batch_data)
+        self._batch_data_dict[batch_id] = batch_data
         self._active_batch_data_id = batch_id
 
     def _load_batch_data_from_dict(self, batch_data_dict):
@@ -157,11 +157,6 @@ class ExecutionEngine(ABC):
         """
         for batch_id, batch_data in batch_data_dict.items():
             self.load_batch_data(batch_id, batch_data)
-
-    # Note: Abe 20201117 : This method should raise NotImplementedError, and the
-    # _get_typed_batch_data methods in child classes should actually do type checking and type conversion.
-    def _get_typed_batch_data(self, batch_data):
-        return batch_data
 
     def resolve_metrics(
         self,

@@ -121,7 +121,7 @@ Notes:
 
         if isinstance(batch_spec, RuntimeDataBatchSpec):
             # batch_data != None is already checked when RuntimeDataBatchSpec is instantiated
-            batch_data = batch_spec.batch_data
+            df = batch_spec.batch_data
 
         elif isinstance(batch_spec, PathBatchSpec):
             reader_method: str = batch_spec.get("reader_method")
@@ -130,7 +130,7 @@ Notes:
             path: str = batch_spec["path"]
             reader_fn: Callable = self._get_reader_fn(reader_method, path)
 
-            batch_data = reader_fn(path, **reader_options)
+            df = reader_fn(path, **reader_options)
 
         elif isinstance(batch_spec, S3BatchSpec):
             if self._s3 is None:
@@ -151,7 +151,7 @@ Notes:
                 )
             )
             reader_fn = self._get_reader_fn(reader_method, s3_url.key)
-            batch_data = reader_fn(
+            df = reader_fn(
                 StringIO(
                     s3_object["Body"]
                     .read()
@@ -164,11 +164,11 @@ Notes:
                 f"batch_spec must be of type RuntimeDataBatchSpec, PathBatchSpec, or S3BatchSpec, not {batch_spec.__class__.__name__}"
             )
 
-        batch_data = self._apply_splitting_and_sampling_methods(batch_spec, batch_data)
-        if batch_data.memory_usage().sum() < HASH_THRESHOLD:
-            batch_markers["pandas_data_fingerprint"] = hash_pandas_dataframe(batch_data)
+        df = self._apply_splitting_and_sampling_methods(batch_spec, df)
+        if df.memory_usage().sum() < HASH_THRESHOLD:
+            batch_markers["pandas_data_fingerprint"] = hash_pandas_dataframe(df)
 
-        typed_batch_data = self._get_typed_batch_data(batch_data)
+        typed_batch_data = PandasBatchData(execution_engine=self, dataframe=df)
 
         return typed_batch_data, batch_markers
 
@@ -183,10 +183,6 @@ Notes:
             sampling_kwargs: str = batch_spec.get("sampling_kwargs") or {}
             batch_data = sampling_fn(batch_data, **sampling_kwargs)
         return batch_data
-
-    def _get_typed_batch_data(self, batch_data):
-        typed_batch_data = PandasBatchData(execution_engine=self, dataframe=batch_data)
-        return typed_batch_data
 
     @property
     def dataframe(self):

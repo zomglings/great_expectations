@@ -15,10 +15,10 @@ from great_expectations.validator.validation_graph import MetricConfiguration
 from great_expectations.validator.validator import Validator
 
 
-class ColumnTypes(TableMetricProvider):
-    metric_name = "table.column_types"
-    value_keys = ("include_nested",)
-    default_kwarg_values = {"include_nested": True}
+class TableHead(TableMetricProvider):
+    metric_name = "table.head"
+    value_keys = ("n_rows",)
+    default_kwarg_values = {"n_rows": 5}
 
     @metric_value(engine=PandasExecutionEngine)
     def _pandas(

@@ -76,6 +76,7 @@ class DataConnector:
         batch_data, batch_markers = self._execution_engine.get_batch_data_and_markers(
             batch_spec=batch_spec
         )
+        self._execution_engine.load_batch_data(batch_definition.id, batch_data)
         return (
             batch_data,
             batch_spec,
@@ -249,15 +250,19 @@ class DataConnector:
         batch_definition = batch_definition_list[0]
 
         # _execution_engine might be None for some tests
-        if self._execution_engine is None:
+        if batch_definition is None or self._execution_engine is None:
             return {}
         batch_data, batch_spec, _ = self.get_batch_data_and_metadata(batch_definition)
 
-        df = batch_data.execution_engine.resolve_metric(
-            MetricConfiguration("table.head", {}, {"n_rows": 5})
+        df = batch_data.execution_engine.resolve_metrics(
+            (
+                MetricConfiguration(
+                    "table.head", {"batch_id": batch_definition.id}, {"n_rows": 5}
+                ),
+            )
         )
-        n_rows = batch_data.execution_engine.resolve_metric(
-            MetricConfiguration("table.row_count", {})
+        n_rows = batch_data.execution_engine.resolve_metrics(
+            (MetricConfiguration("table.row_count", {"batch_id": batch_definition.id}),)
         )
 
         if pretty_print and df is not None:
