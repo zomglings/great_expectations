@@ -1,11 +1,12 @@
 import copy
 import logging
+from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Dict, Iterable, Tuple, Union
 
 from ruamel.yaml import YAML
 
-from great_expectations.core.batch import Batch, BatchSpec
+from great_expectations.core.batch import Batch, BatchMarkers, BatchSpec
 from great_expectations.exceptions import GreatExpectationsError
 from great_expectations.expectations.registry import get_metric_provider
 from great_expectations.util import (
@@ -27,7 +28,16 @@ class NoOpDict:
         return None
 
 
-class ExecutionEngine:
+class BatchData:
+    def __init__(self, execution_engine):
+        self._execution_engine = execution_engine
+
+    @property
+    def execution_engine(self):
+        return self._execution_engine
+
+
+class ExecutionEngine(ABC):
     recognized_batch_spec_defaults = set()
 
     def __init__(
@@ -129,6 +139,10 @@ class ExecutionEngine:
         """
         batch_data, _ = self.get_batch_data_and_markers(batch_spec)
         return batch_data
+
+    @abstractmethod
+    def get_batch_data_and_markers(self, batch_spec) -> Tuple[BatchData, BatchMarkers]:
+        raise NotImplementedError
 
     def load_batch_data(self, batch_id: str, batch_data: Any) -> None:
         """

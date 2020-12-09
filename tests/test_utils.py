@@ -832,10 +832,11 @@ def _build_sa_engine(df):
 
     eng = sa.create_engine("sqlite://", echo=False)
     df.to_sql("test", eng)
-    batch_data = SqlAlchemyBatchData(engine=eng, table_name="test")
+    engine = SqlAlchemyExecutionEngine(engine=eng)
+    batch_data = SqlAlchemyBatchData(execution_engine=engine, table_name="test")
     batch = Batch(data=batch_data)
-    engine = SqlAlchemyExecutionEngine(
-        engine=eng, batch_data_dict={batch.id: batch_data}
+    engine.load_batch_data(
+        batch_id=batch.batch_definition.to_id(), batch_data=batch_data
     )
     return engine
 
@@ -937,11 +938,11 @@ def _build_sa_validator_with_data(
     df.to_sql(
         name=table_name, con=engine, index=False, dtype=sql_dtypes, if_exists="replace",
     )
-
-    batch_data = SqlAlchemyBatchData(engine=engine, table_name=table_name)
-    batch = Batch(data=batch_data)
     execution_engine = SqlAlchemyExecutionEngine(caching=caching, engine=engine)
-
+    batch_data = SqlAlchemyBatchData(
+        execution_engine=execution_engine, table_name=table_name
+    )
+    batch = Batch(data=batch_data)
     return Validator(execution_engine=execution_engine, batches=(batch,))
 
 

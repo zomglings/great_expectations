@@ -10,6 +10,7 @@ from dateutil.parser import parse
 from great_expectations.exceptions import GreatExpectationsError
 from great_expectations.validator.validator import Validator
 
+from ..core.batch import Batch
 from ..core.expectation_suite import ExpectationSuite
 from ..core.run_identifier import RunIdentifier
 from ..data_asset import DataAsset
@@ -154,7 +155,7 @@ class DataAssetProfiler:
 class DatasetProfiler(DataAssetProfiler):
     @classmethod
     def validate(cls, dataset):
-        return isinstance(dataset, (Dataset, Validator))
+        return isinstance(dataset, (Dataset, Validator, Batch))
 
     @classmethod
     def add_expectation_meta(cls, expectation):
@@ -231,7 +232,10 @@ class DatasetProfiler(DataAssetProfiler):
             validation_results = data_asset.validate(
                 expectation_suite, run_id=run_id, result_format="SUMMARY"
             )
-
+        elif isinstance(data_asset, Batch):
+            validation_results = Validator(
+                execution_engine=data_asset.data.execution_engine, batches=[data_asset]
+            )
         else:
             batch_kwargs = data_asset.batch_kwargs
 
@@ -241,7 +245,8 @@ class DatasetProfiler(DataAssetProfiler):
                 expectation_suite, run_id=run_id, result_format="SUMMARY"
             )
             expectation_suite.add_citation(
-                comment=str(cls.__name__) + " added a citation based on the current batch.",
+                comment=str(cls.__name__)
+                + " added a citation based on the current batch.",
                 batch_kwargs=batch_kwargs,
                 batch_markers=data_asset.batch_markers,
                 batch_parameters=data_asset.batch_parameters,

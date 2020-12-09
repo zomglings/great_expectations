@@ -26,17 +26,21 @@ from ..core.batch import BatchMarkers
 from ..core.id_dict import BatchSpec
 from ..datasource.util import hash_pandas_dataframe
 from ..exceptions import BatchSpecError, GreatExpectationsError, ValidationError
-from .execution_engine import ExecutionEngine, MetricDomainTypes
+from .execution_engine import BatchData, ExecutionEngine, MetricDomainTypes
 
 logger = logging.getLogger(__name__)
 
 HASH_THRESHOLD = 1e9
 
 
-class PandasBatchData(pd.DataFrame):
-    # @property
-    def row_count(self):
-        return self.shape[0]
+class PandasBatchData(BatchData):
+    def __init__(self, execution_engine, dataframe: pd.DataFrame):
+        super().__init__(execution_engine=execution_engine)
+        self._dataframe = dataframe
+
+    @property
+    def dataframe(self):
+        return self._dataframe
 
 
 class PandasExecutionEngine(ExecutionEngine):
@@ -181,7 +185,7 @@ Notes:
         return batch_data
 
     def _get_typed_batch_data(self, batch_data):
-        typed_batch_data = PandasBatchData(batch_data)
+        typed_batch_data = PandasBatchData(execution_engine=self, dataframe=batch_data)
         return typed_batch_data
 
     @property
@@ -297,14 +301,14 @@ Notes:
         if batch_id is None:
             # We allow no batch id specified if there is only one batch
             if self.active_batch_data_id is not None:
-                data = self.active_batch_data
+                data = self.active_batch_data.dataframe
             else:
                 raise ValidationError(
                     "No batch is specified, but could not identify a loaded batch."
                 )
         else:
             if batch_id in self.loaded_batch_data_dict:
-                data = self.loaded_batch_data_dict[batch_id]
+                data = self.loaded_batch_data_dict[batch_id].dataframe
             else:
                 raise ValidationError(f"Unable to find batch with batch_id {batch_id}")
 

@@ -8,6 +8,8 @@ from great_expectations.datasource.data_connector.util import (
     fetch_batch_data_as_pandas_df,
 )
 from great_expectations.execution_engine import ExecutionEngine
+from great_expectations.validator.validation_graph import MetricConfiguration
+from great_expectations.validator.validator import Validator
 
 logger = logging.getLogger(__name__)
 
@@ -251,8 +253,12 @@ class DataConnector:
             return {}
         batch_data, batch_spec, _ = self.get_batch_data_and_metadata(batch_definition)
 
-        df = batch_data.head(n=5)
-        n_rows = batch_data.row_count()
+        df = batch_data.execution_engine.resolve_metric(
+            MetricConfiguration("table.head", {}, {"n_rows": 5})
+        )
+        n_rows = batch_data.execution_engine.resolve_metric(
+            MetricConfiguration("table.row_count", {})
+        )
 
         if pretty_print and df is not None:
             print(f"\n\t\tShowing 5 rows")

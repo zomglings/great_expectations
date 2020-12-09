@@ -17,7 +17,10 @@ from great_expectations.exceptions import (
     InvalidConfigError,
 )
 from great_expectations.execution_engine import ExecutionEngine
-from great_expectations.execution_engine.execution_engine import MetricDomainTypes
+from great_expectations.execution_engine.execution_engine import (
+    BatchData,
+    MetricDomainTypes,
+)
 from great_expectations.expectations.row_conditions import parse_condition_to_sqlalchemy
 from great_expectations.util import (
     filter_properties_dict,
@@ -121,13 +124,13 @@ def _get_dialect_type_module(dialect):
     return dialect
 
 
-class SqlAlchemyBatchData(object):
+class SqlAlchemyBatchData(BatchData):
     """A class which represents a SQL alchemy batch, with properties including the construction of the batch itself
     and several getters used to access various properties."""
 
     def __init__(
         self,
-        engine,
+        execution_engine,
         record_set_name: str = None,
         # Option 1
         schema_name: str = None,
@@ -183,6 +186,8 @@ class SqlAlchemyBatchData(object):
 
 
         """
+        super().__init__(execution_engine)
+        engine = execution_engine.engine
         self._engine = engine
         self._record_set_name = record_set_name or "great_expectations_sub_selection"
         if not isinstance(self._record_set_name, str):
@@ -997,7 +1002,9 @@ class SqlAlchemyExecutionEngine(ExecutionEngine):
         else:
             temp_table_name = None
         batch_data = SqlAlchemyBatchData(
-            engine=self.engine, selectable=selectable, temp_table_name=temp_table_name
+            execution_engine=self,
+            selectable=selectable,
+            temp_table_name=temp_table_name,
         )
 
         batch_markers = BatchMarkers(
