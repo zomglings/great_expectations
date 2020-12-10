@@ -359,4 +359,3 @@ def test_get_batch_list_from_new_style_datasource_with_sql_datasource(
     )
     assert batch.batch_definition["partition_definition"] == {"date": "2020-01-15"}
     assert isinstance(batch.data, SqlAlchemyBatchData)
-    assert len(batch.data.head(fetch_all=True)) == 4

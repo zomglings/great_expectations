@@ -4,6 +4,14 @@
 Changelog
 #########
 
+Develop
+-----------------
+* [ENHANCEMENT] BatchData in the new Datasource API is now more fully implemented, and exposes a `dataframe` or `
+selectable` property, instead of exposing a raw data object. Similarly, it exposes an execution_engine property,
+which is suitable for instantiating a Validator to produce metrics directly from a Batch. We intend to continue to
+update BatchData as part of our plans to support Validations involving multiple tables, while preserving the
+behavior for the common cases.
+
 0.13.2
 -----------------
 * [ENHANCEMENT] Support avro format in Spark datasource (thanks @ryanaustincarlson!) #2122

@@ -17,8 +17,8 @@ from great_expectations.validator.validator import Validator
 
 class TableHead(TableMetricProvider):
     metric_name = "table.head"
-    value_keys = ("n_rows",)
-    default_kwarg_values = {"n_rows": 5}
+    value_keys = ("n_rows", "fetch_all")
+    default_kwarg_values = {"n_rows": 5, "fetch_all": False}
 
     @metric_value(engine=PandasExecutionEngine)
     def _pandas(
@@ -32,6 +32,8 @@ class TableHead(TableMetricProvider):
         df, _, _ = execution_engine.get_compute_domain(
             metric_domain_kwargs, domain_type=MetricDomainTypes.TABLE
         )
+        if metric_value_kwargs.get("fetch_all", cls.default_kwarg_values["fetch_all"]):
+            return df
         return df.head(metric_value_kwargs["n_rows"])
 
     @metric_value(engine=SqlAlchemyExecutionEngine)
@@ -50,14 +52,21 @@ class TableHead(TableMetricProvider):
         table_name = getattr(selectable, "name", None)
         if table_name is not None:
             try:
-                df = next(
-                    pd.read_sql_table(
+                if metric_value_kwargs["fetch_all"]:
+                    df = pd.read_sql_table(
                         table_name=getattr(selectable, "name", None),
                         schema=getattr(selectable, "schema", None),
                         con=execution_engine.engine,
-                        chunksize=metric_value_kwargs["n_rows"],
                     )
-                )
+                else:
+                    df = next(
+                        pd.read_sql_table(
+                            table_name=getattr(selectable, "name", None),
+                            schema=getattr(selectable, "schema", None),
+                            con=execution_engine.engine,
+                            chunksize=metric_value_kwargs["n_rows"],
+                        )
+                    )
             except (ValueError, NotImplementedError):
                 # it looks like MetaData that is used by pd.read_sql_table
                 # cannot work on a temp table.
@@ -71,11 +80,11 @@ class TableHead(TableMetricProvider):
                 df = pd.DataFrame(columns=columns)
         if df is None:
             # we want to compile our selectable
-            stmt = (
-                sa.select(["*"])
-                .select_from(selectable)
-                .limit(metric_value_kwargs["n_rows"])
-            )
+            stmt = sa.select(["*"]).select_from(selectable)
+            if metric_value_kwargs["fetch_all"]:
+                pass
+            else:
+                stmt = stmt.limit(metric_value_kwargs["n_rows"])
             sql = stmt.compile(
                 dialect=execution_engine.engine.dialect,
                 compile_kwargs={"literal_binds": True},
@@ -96,4 +105,6 @@ class TableHead(TableMetricProvider):
         df, _, _ = execution_engine.get_compute_domain(
             metric_domain_kwargs, domain_type=MetricDomainTypes.TABLE
         )
+        if metric_value_kwargs["fetch_all"]:
+            return df.collect()
         return df.head(metric_value_kwargs["n_rows"])

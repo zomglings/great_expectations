@@ -29,6 +29,7 @@ from great_expectations.execution_engine import (
     PandasExecutionEngine,
     SparkDFExecutionEngine,
 )
+from great_expectations.execution_engine.sparkdf_batch_data import SparkDFBatchData
 from great_expectations.execution_engine.sqlalchemy_batch_data import (
     SqlAlchemyBatchData,
 )
@@ -1231,7 +1232,7 @@ def check_json_test_result(test, result, data_asset=None):
             elif key == "unexpected_index_list":
                 if isinstance(data_asset, (SqlAlchemyDataset, SparkDFDataset)):
                     pass
-                elif isinstance(data_asset, (SqlAlchemyBatchData, SparkDataFrame)):
+                elif isinstance(data_asset, (SqlAlchemyBatchData, SparkDFBatchData)):
                     pass
                 else:
                     assert result["result"]["unexpected_index_list"] == value

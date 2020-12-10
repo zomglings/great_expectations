@@ -35,6 +35,7 @@ from great_expectations.exceptions import (
 from great_expectations.execution_engine.pandas_batch_data import PandasBatchData
 from great_expectations.expectations.registry import (
     get_expectation_impl,
+    get_metric_kwargs,
     get_metric_provider,
     list_registered_expectation_implementations,
 )
@@ -274,6 +275,15 @@ class Validator:
         """Returns the execution engine being used by the validator at the given time"""
         return self._execution_engine
 
+    def head(self, n_rows=5, domain_kwargs=None, fetch_all=False):
+        if domain_kwargs is None:
+            domain_kwargs = {"batch_id": self.execution_engine.active_batch_data_id}
+        return self.get_metric(
+            MetricConfiguration(
+                "table.head", domain_kwargs, {"n_rows": n_rows, "fetch_all": fetch_all}
+            )
+        )
+
     def list_available_expectation_types(self):
         """ Returns a list of all expectations available to the validator"""
         keys = dir(self)
@@ -286,6 +296,25 @@ class Validator:
         graph = ValidationGraph()
         resolved_metrics = {}
         for metric_name, metric_configuration in metrics.items():
+            provider_cls, _ = get_metric_provider(
+                metric_configuration.metric_name, self.execution_engine
+            )
+            for key in provider_cls.domain_keys:
+                if (
+                    key not in metric_configuration.metric_domain_kwargs
+                    and key in provider_cls.default_kwarg_values
+                ):
+                    metric_configuration.metric_domain_kwargs[
+                        key
+                    ] = provider_cls.default_kwarg_values[key]
+            for key in provider_cls.value_keys:
+                if (
+                    key not in metric_configuration.metric_value_kwargs
+                    and key in provider_cls.default_kwarg_values
+                ):
+                    metric_configuration.metric_value_kwargs[
+                        key
+                    ] = provider_cls.default_kwarg_values[key]
             self.build_metric_dependency_graph(
                 graph,
                 child_node=metric_configuration,
@@ -315,7 +344,6 @@ class Validator:
         """Obtain domain and value keys for metrics and proceeds to add these metrics to the validation graph
         until all metrics have been added."""
 
-        # metric_kwargs = get_metric_kwargs(metric_name)
         metric_impl = get_metric_provider(
             child_node.metric_name, execution_engine=execution_engine
         )[0]

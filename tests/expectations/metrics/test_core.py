@@ -184,10 +184,10 @@ def test_map_of_type_sa(sa):
     eng = sa.create_engine("sqlite://")
     df = pd.DataFrame({"a": [1, 2, 3, 3, None]})
     df.to_sql("test", eng, index=False)
-    batch_data = SqlAlchemyBatchData(engine=eng, table_name="test")
-    engine = SqlAlchemyExecutionEngine(
-        engine=eng, batch_data_dict={"my_id": batch_data}
-    )
+    engine = SqlAlchemyExecutionEngine(engine=eng,)
+    batch_data = SqlAlchemyBatchData(execution_engine=engine, table_name="test")
+    engine.load_batch_data("my_id", batch_data)
+
     desired_metric = MetricConfiguration(
         metric_name="table.column_types",
         metric_domain_kwargs={},

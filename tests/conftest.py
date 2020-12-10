@@ -33,7 +33,6 @@ from great_expectations.datasource import SqlAlchemyDatasource
 from great_expectations.datasource.new_datasource import Datasource
 from great_expectations.execution_engine import SqlAlchemyExecutionEngine
 from great_expectations.util import import_library_module
-
 from tests.test_utils import (
     create_files_in_directory,
     expectationSuiteValidationResultSchema,
@@ -3138,8 +3137,11 @@ introspection:
 
     return context
 
+
 @pytest.fixture
-def data_context_with_pandas_datasource_for_testing_get_batch(empty_data_context_v3, tmp_path_factory):
+def data_context_with_pandas_datasource_for_testing_get_batch(
+    empty_data_context_v3, tmp_path_factory
+):
     context = empty_data_context_v3
 
     base_directory: str = str(
@@ -3188,9 +3190,8 @@ data_connectors:
 """,
     )
 
-    context.add_datasource("my_pandas_datasource", config)
+    context.add_datasource("my_pandas_datasource", **config)
     return context
-
 
 
 @pytest.fixture

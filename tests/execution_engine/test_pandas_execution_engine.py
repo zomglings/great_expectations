@@ -415,15 +415,19 @@ def test_get_batch_with_split_on_column_value(test_df):
     assert split_df.shape == (12, 10)
     assert (split_df.batch_id == 2).all()
 
-    split_df = PandasExecutionEngine().get_batch_data(
-        RuntimeDataBatchSpec(
-            batch_data=test_df,
-            splitter_method="_split_on_column_value",
-            splitter_kwargs={
-                "column_name": "date",
-                "partition_definition": {"date": datetime.date(2020, 1, 30)},
-            },
+    split_df = (
+        PandasExecutionEngine()
+        .get_batch_data(
+            RuntimeDataBatchSpec(
+                batch_data=test_df,
+                splitter_method="_split_on_column_value",
+                splitter_kwargs={
+                    "column_name": "date",
+                    "partition_definition": {"date": datetime.date(2020, 1, 30)},
+                },
+            )
         )
+        .dataframe
     )
     assert (split_df).shape == (3, 10)
 
