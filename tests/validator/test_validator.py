@@ -317,7 +317,7 @@ def test_graph_validate_with_runtime_config(basic_datasource):
         )
     ]
 
-
+#<WILL> this is a useful test that I want to extend
 def test_validator_default_expectation_args__pandas(basic_datasource):
     df = pd.DataFrame({"a": [1, 5, 22, 3, 5, 10], "b": [1, 2, 3, 4, 5, None]})
 
@@ -344,6 +344,67 @@ def test_validator_default_expectation_args__pandas(basic_datasource):
     my_validator = Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
     print(my_validator.get_default_expectation_arguments())
+
+
+
+#<WILL> this is a useful test that I want to extend
+def test_validator_default_expectation_args__pandas_allow_me_to_set_name(basic_datasource):
+    df = pd.DataFrame({"a": [1, 5, 22, 3, 5, 10], "b": [1, 2, 3, 4, 5, None]})
+
+    # what should this be able to do?
+    # default?
+
+    #
+    batch = basic_datasource.get_single_batch_from_batch_request(
+        BatchRequest(
+            **{
+                "datasource_name": "my_datasource",
+                "data_connector_name": "test_runtime_data_connector",
+                #"data_asset_name": "IN_MEMORY_DATA_ASSET",
+                "batch_data": df,
+                "partition_request": PartitionRequest(
+                    **{
+                        "partition_identifiers": {
+                            "pipeline_stage_name": 0,
+                            "airflow_run_id": 0,
+                            "custom_key_0": 0,
+                        }
+                    }
+                ),
+            }
+        )
+    )
+
+    print([batch])
+
+    batch = basic_datasource.get_single_batch_from_batch_request(
+        BatchRequest(
+            **{
+                "datasource_name": "my_datasource",
+                "data_connector_name": "test_runtime_data_connector",
+                "data_asset_name": "my_named_data_asset",
+                "batch_data": df,
+                "partition_request": PartitionRequest(
+                    **{
+                        "partition_identifiers": {
+                            "pipeline_stage_name": 0,
+                            "airflow_run_id": 0,
+                            "custom_key_0": 0,
+                        }
+                    }
+                ),
+            }
+        )
+    )
+
+
+    print([batch])
+
+    my_validator = Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
+
+    print(my_validator.get_default_expectation_arguments())
+
+
 
 
 def test_validator_default_expectation_args__sql(

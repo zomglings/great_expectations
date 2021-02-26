@@ -97,6 +97,7 @@ class BaseDatasource:
             )
         return batch_list[0]
 
+    # <WILL> placeholder this is the key method for my PR :::remove_before_merging:::
     def get_batch_list_from_batch_request(
         self, batch_request: BatchRequest
     ) -> List[Batch]:
@@ -117,6 +118,8 @@ class BaseDatasource:
         ] = data_connector.get_batch_definition_list_from_batch_request(
             batch_request=batch_request
         )
+        print(batch_definition_list)
+        print("HOW COME WE DONT GO TO DATA CONNECTOR?")
 
         if batch_request["batch_data"] is None:
             batches: List[Batch] = []

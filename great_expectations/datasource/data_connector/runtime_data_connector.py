@@ -39,7 +39,6 @@ class RuntimeDataConnector(DataConnector):
         runtime_keys: Optional[list] = None,
     ):
         logger.debug(f'Constructing RuntimeDataConnector "{name}".')
-
         super().__init__(
             name=name,
             datasource_name=datasource_name,
@@ -81,6 +80,9 @@ class RuntimeDataConnector(DataConnector):
                 data_asset_name=data_asset_name,
             )
         )
+
+        print("hi will this is batch_definition list")
+        print(batch_definition_list)
 
         if len(batch_definition_list) == 0:
             return []
@@ -151,8 +153,19 @@ class RuntimeDataConnector(DataConnector):
         self,
         batch_request: BatchRequestBase,
     ) -> List[BatchDefinition]:
-        self._validate_batch_request(batch_request=batch_request)
 
+        # this is the initial version of a bypass
+        if batch_request.data_asset_name:
+            data_asset_name = batch_request.data_asset_name
+        else:
+            data_asset_name = DEFAULT_DATA_ASSET_NAME
+
+        print("data_ASSET_NAME!!!!")
+        print(data_asset_name)
+        #batch_request.data_asset_name = data_asset_name
+
+        self._validate_batch_request(batch_request=batch_request)
+        print("I made it here so far?")
         partition_identifiers: Optional[dict] = None
         if batch_request.partition_request:
             self._validate_partition_identifiers(
@@ -167,11 +180,13 @@ class RuntimeDataConnector(DataConnector):
             partition_identifiers = {}
 
         batch_definition_list: List[BatchDefinition]
+        print("HELLO WORLD?!")
+
 
         batch_definition: BatchDefinition = BatchDefinition(
             datasource_name=self.datasource_name,
             data_connector_name=self.name,
-            data_asset_name=DEFAULT_DATA_ASSET_NAME,
+            data_asset_name=data_asset_name,
             partition_definition=PartitionDefinition(partition_identifiers),
         )
 
@@ -187,6 +202,9 @@ class RuntimeDataConnector(DataConnector):
     def _map_data_reference_to_batch_definition_list(
         self, data_reference: str, data_asset_name: Optional[str] = None
     ) -> Optional[List[BatchDefinition]]:
+
+        # <WILL> this is an attempt at a check
+        # but it isn't going to cut it
         if data_asset_name is None:
             data_asset_name = DEFAULT_DATA_ASSET_NAME
         return [
@@ -251,6 +269,8 @@ class RuntimeDataConnector(DataConnector):
         return data_reference_name
 
     def _validate_batch_request(self, batch_request: BatchRequestBase):
+        # <WILL> this should be something..
+
         super()._validate_batch_request(batch_request=batch_request)
 
         # Insure that batch_data and batch_request satisfy the "if and only if" condition.

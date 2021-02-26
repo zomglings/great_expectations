@@ -286,6 +286,10 @@ class BatchRequest(BatchRequestBase):
         limit: Optional[int] = None,
         batch_spec_passthrough: Optional[dict] = None,
     ):
+
+        # <WILL> do we know what kind of data connector we have?
+        # are we going to allow for the data_asset_to_be_null?
+        # because this is basically happening before anything.. it's
         self._validate_batch_request(
             datasource_name=datasource_name,
             data_connector_name=data_connector_name,
@@ -307,7 +311,7 @@ class BatchRequest(BatchRequestBase):
     def _validate_batch_request(
         datasource_name: str,
         data_connector_name: str,
-        data_asset_name: str,
+        data_asset_name: str = None,
         partition_request: Optional[Union[PartitionRequest, dict]] = None,
         limit: Optional[int] = None,
     ):
@@ -324,12 +328,13 @@ class BatchRequest(BatchRequestBase):
 "{str(type(data_connector_name))}", which is illegal.
                 """
             )
-        if not (data_asset_name and isinstance(data_asset_name, str)):
-            raise TypeError(
-                f"""The type of a data_asset name must be a string (Python "str").  The type given is
-"{str(type(data_asset_name))}", which is illegal.
-                """
-            )
+        # WILL 20210226 - this can be none in the case of runtime data connecto
+#         if not (data_asset_name and isinstance(data_asset_name, str)):
+#             raise TypeError(
+#                 f"""The type of a data_asset name must be a string (Python "str").  The type given is
+# "{str(type(data_asset_name))}", which is illegal.
+#                 """
+#             )
         # TODO Abe 20201015: Switch this to PartitionRequest.
         if partition_request and not isinstance(partition_request, dict):
             raise TypeError(

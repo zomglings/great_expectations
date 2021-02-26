@@ -31,7 +31,7 @@ yaml = YAML()
 def basic_pandas_datasource_v013(tmp_path_factory):
     base_directory: str = str(
         tmp_path_factory.mktemp(
-            "basic_pandas_datasource_v013_filesystem_data_connector"
+            "basic_pandas_datasource_v013_filesystem_data_connector"><
         )
     )
 
@@ -184,7 +184,7 @@ data_connectors:
 
     return sample_datasource
 
-
+# <WILL> useful test to extend
 def test_basic_pandas_datasource_v013_self_check(basic_pandas_datasource_v013):
     report = basic_pandas_datasource_v013.self_check()
     assert report == {
@@ -811,3 +811,6 @@ data_connectors:
         ]["n_rows"]
         == 10
     )
+
+
+# add in memory datasource name?
