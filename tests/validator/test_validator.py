@@ -343,18 +343,14 @@ def test_validator_default_expectation_args__pandas(basic_datasource):
 
     my_validator = Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
 
-    print(my_validator.get_default_expectation_arguments())
+    assert my_validator.get_default_expectation_arguments() == {'include_config': True, 'catch_exceptions': False, 'result_format': 'BASIC'}
 
 
-
-#<WILL> this is a useful test that I want to extend
 def test_validator_default_expectation_args__pandas_allow_me_to_set_name(basic_datasource):
-    df = pd.DataFrame({"a": [1, 5, 22, 3, 5, 10], "b": [1, 2, 3, 4, 5, None]})
 
-    # what should this be able to do?
-    # default?
-
+    #<WILL> 202102 move this to datasource tests... ones that are configured with runtime_data_conenctor
     #
+    df = pd.DataFrame({"a": [1, 5, 22, 3, 5, 10], "b": [1, 2, 3, 4, 5, None]})
     batch = basic_datasource.get_single_batch_from_batch_request(
         BatchRequest(
             **{
@@ -374,8 +370,8 @@ def test_validator_default_expectation_args__pandas_allow_me_to_set_name(basic_d
             }
         )
     )
-
-    print([batch])
+    # some test against the batch that comes back
+    assert batch.batch_definition.data_asset_name == "IN_MEMORY_DATA_ASSET"
 
     batch = basic_datasource.get_single_batch_from_batch_request(
         BatchRequest(
@@ -397,14 +393,9 @@ def test_validator_default_expectation_args__pandas_allow_me_to_set_name(basic_d
         )
     )
 
-
-    print([batch])
-
+    assert batch.batch_definition.data_asset_name == "my_named_data_asset"
     my_validator = Validator(execution_engine=PandasExecutionEngine(), batches=[batch])
-
-    print(my_validator.get_default_expectation_arguments())
-
-
+    assert my_validator.get_default_expectation_arguments() == {'include_config': True, 'catch_exceptions': False, 'result_format': 'BASIC'}
 
 
 def test_validator_default_expectation_args__sql(

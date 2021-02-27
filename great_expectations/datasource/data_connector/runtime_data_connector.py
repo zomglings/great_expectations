@@ -24,7 +24,6 @@ from great_expectations.execution_engine import ExecutionEngine
 
 logger = logging.getLogger(__name__)
 
-
 DEFAULT_DATA_ASSET_NAME: str = "IN_MEMORY_DATA_ASSET"
 DEFAULT_DELIMITER: str = "-"
 

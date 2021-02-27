@@ -7,7 +7,7 @@ from ruamel.yaml import YAML
 import great_expectations.exceptions as ge_exceptions
 from great_expectations.core.batch import BatchDefinition, BatchRequest, BatchSpec
 from great_expectations.core.batch_spec import RuntimeDataBatchSpec
-from great_expectations.core.id_dict import PartitionDefinition
+from great_expectations.core.id_dict import PartitionDefinition, PartitionRequest
 from great_expectations.datasource.data_connector import RuntimeDataConnector
 
 yaml = YAML()
@@ -32,7 +32,6 @@ def test_self_check(basic_datasource):
         "example_unmatched_data_references": [],
         "example_data_reference": {},
     }
-
 
 def test_error_checking(basic_datasource):
     test_df: pd.DataFrame = pd.DataFrame(data={"col1": [1, 2], "col2": [3, 4]})
@@ -98,7 +97,7 @@ def test_error_checking(basic_datasource):
             )
         )
 
-    # Test for illegal falsiness of partition_request["partition_identifiers"] when batch_data is specified
+    # Test for illegal falseness of partition_request["partition_identifiers"] when batch_data is specified
     partition_request: dict = {"partition_identifiers": {}}
     with pytest.raises(ge_exceptions.DataConnectorError):
         # noinspection PyUnusedLocal
@@ -219,6 +218,68 @@ def test_partition_request_and_runtime_keys_error_illegal_keys(
         ] = test_runtime_data_connector.get_batch_definition_list_from_batch_request(
             batch_request=batch_request
         )
+
+def test_getting_and_setting_data_asset_name(basic_datasource):
+    test_runtime_data_connector: RuntimeDataConnector = (
+        basic_datasource.data_connectors["test_runtime_data_connector"]
+    )
+
+    df = pd.DataFrame({"a": [1, 5, 22, 3, 5, 10], "b": [1, 2, 3, 4, 5, None]})
+
+    batch_request = BatchRequest(
+        **{
+            "datasource_name": "my_datasource",
+            "data_connector_name": "test_runtime_data_connector",
+            "batch_data": df,
+            "partition_request": PartitionRequest(
+                **{
+                    "partition_identifiers": {
+                        "pipeline_stage_name": 0,
+                        "airflow_run_id": 0,
+                        "custom_key_0": 0,
+                    }
+                }
+            ),
+        }
+    )
+
+    batch_definition_list: List[
+        BatchDefinition
+    ] = test_runtime_data_connector.get_batch_definition_list_from_batch_request(
+        batch_request=batch_request
+    )
+
+    # testing default behavior
+    assert len(batch_definition_list) == 1
+    assert batch_definition_list[0]["data_asset_name"] == "IN_MEMORY_DATA_ASSET"
+
+    # this time we are setting a data_asset_name
+    batch_request = BatchRequest(
+        **{
+            "datasource_name": "my_datasource",
+            "data_connector_name": "test_runtime_data_connector",
+            "data_asset_name": "I_AM_A_DATA_ASSET",
+            "batch_data": df,
+            "partition_request": PartitionRequest(
+                **{
+                    "partition_identifiers": {
+                        "pipeline_stage_name": 0,
+                        "airflow_run_id": 0,
+                        "custom_key_0": 0,
+                    }
+                }
+            ),
+        }
+    )
+
+    batch_definition_list: List[
+        BatchDefinition
+    ] = test_runtime_data_connector.get_batch_definition_list_from_batch_request(
+        batch_request=batch_request
+    )
+    # testing default behavior
+    assert len(batch_definition_list) == 1
+    assert batch_definition_list[0]["data_asset_name"] == "I_AM_A_DATA_ASSET"
 
 
 def test_get_available_data_asset_names(basic_datasource):
