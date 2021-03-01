@@ -32,7 +32,6 @@ def test_basic_instantiation(tmp_path_factory):
             "alpha-3.csv",
         ],
     )
-
     my_data_connector = ConfiguredAssetFilesystemDataConnector(
         name="my_data_connector",
         datasource_name="FAKE_DATASOURCE_NAME",
@@ -254,6 +253,7 @@ def test_return_all_batch_definitions_unsorted(tmp_path_factory):
     with pytest.raises(TypeError):
         my_data_connector.get_batch_definition_list_from_batch_request()
 
+    # <WILL> need to be changed
     # with unnamed data_asset_name
     with pytest.raises(TypeError):
         my_data_connector.get_batch_definition_list_from_batch_request(

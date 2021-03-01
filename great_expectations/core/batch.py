@@ -328,7 +328,7 @@ class BatchRequest(BatchRequestBase):
 "{str(type(data_connector_name))}", which is illegal.
                 """
             )
-        # WILL 20210226 - this can be none in the case of runtime data connecto
+        # WILL 20210226 - this can be none in the case of runtime data connector
 #         if not (data_asset_name and isinstance(data_asset_name, str)):
 #             raise TypeError(
 #                 f"""The type of a data_asset name must be a string (Python "str").  The type given is
