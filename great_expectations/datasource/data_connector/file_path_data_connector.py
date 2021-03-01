@@ -262,12 +262,12 @@ partition definition {batch_definition.partition_definition} from batch definiti
         # <WILL> DO THE CHECK HERE
         #WILL 20210226 - this can be none in the case of runtime data connector
         # TODO : do a check on ths!?!?!
-        if not (batch_request.data_asset_name and isinstance(batch_request.data_asset_name, str)):
-            raise TypeError(
-                    f"""The type of a data_asset name must be a string (Python "str").  The type given is
-        "{str(type(batch_request.data_asset_name))}", which is illegal.
-                        """
-                    )
+        # if not (batch_request.data_asset_name and isinstance(batch_request.data_asset_name, str)):
+        #     raise TypeError(
+        #             f"""The type of a data_asset name must be a string (Python "str").  The type given is
+        # "{str(type(batch_request.data_asset_name))}", which is illegal.
+        #                 """
+        #             )
         self._validate_sorters_configuration(
             data_asset_name=batch_request.data_asset_name
         )

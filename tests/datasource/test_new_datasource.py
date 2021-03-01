@@ -34,7 +34,7 @@ yaml = YAML()
 def basic_pandas_datasource_v013(tmp_path_factory):
     base_directory: str = str(
         tmp_path_factory.mktemp(
-            "basic_pandas_datasource_v013_filesystem_data_connector"><
+            "basic_pandas_datasource_v013_filesystem_data_connector"
         )
     )
 

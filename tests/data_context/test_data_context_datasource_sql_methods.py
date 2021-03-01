@@ -13,7 +13,7 @@ from great_expectations.marshmallow__shade.exceptions import ValidationError
 
 yaml = YAML()
 
-
+# <WILL> this fails
 def test_get_batch(data_context_with_sql_datasource_for_testing_get_batch):
     context = data_context_with_sql_datasource_for_testing_get_batch
 
@@ -69,11 +69,13 @@ def test_get_batch(data_context_with_sql_datasource_for_testing_get_batch):
         )
 
     # Failed specification using an incomplete BatchRequest
+    # <WILL> we need to check this
     with pytest.raises(TypeError):
         context.get_batch(
             batch_request=BatchRequest(
                 datasource_name="my_sqlite_db",
                 data_connector_name="daily",
+                #data_asset_name=MISSING
             )
         )
 
@@ -133,6 +135,7 @@ def test_get_batch(data_context_with_sql_datasource_for_testing_get_batch):
     )
 
 
+# <WILL> this fails
 def test_get_validator(data_context_with_sql_datasource_for_testing_get_batch):
     context = data_context_with_sql_datasource_for_testing_get_batch
     context.create_expectation_suite("my_expectations")

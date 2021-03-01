@@ -362,6 +362,11 @@ class DataConnector:
             batch_request (BatchRequest): batch_request to validate
 
         """
+        if not (batch_request.data_asset_name and isinstance(batch_request.data_asset_name, str)):
+            raise TypeError(
+                        f"""The type of a data_asset name must be a string (Python "str").  The type given is
+                        "{str(type(batch_request.data_asset_name))}", which is illegal.
+                        """)
         if batch_request.datasource_name != self.datasource_name:
 
             raise ValueError(

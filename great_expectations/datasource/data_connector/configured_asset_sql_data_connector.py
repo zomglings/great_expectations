@@ -138,13 +138,14 @@ class ConfiguredAssetSqlDataConnector(DataConnector):
         return []
 
     def get_batch_definition_list_from_batch_request(self, batch_request: BatchRequest):
+
         self._validate_batch_request(batch_request=batch_request)
 
         if self._data_references_cache is None:
             self._refresh_data_references_cache()
 
         batch_definition_list: List[BatchDefinition] = []
-
+        # <WILL> WE CROSS HERE?
         try:
             sub_cache = self._data_references_cache[batch_request.data_asset_name]
         except KeyError as e:

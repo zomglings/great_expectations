@@ -337,7 +337,7 @@ def test_get_batch_definition_list_from_batch_request_length_one(
     ] = test_runtime_data_connector.get_batch_definition_list_from_batch_request(
         batch_request=batch_request
     )
-
+    # THIS FAILS
     assert batch_definition_list == expected_batch_definition_list
 
 
