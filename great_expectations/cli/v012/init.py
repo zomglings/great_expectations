@@ -116,7 +116,6 @@ def init(target_directory, view, usage_stats):
             cli_message("<red>{}</red>".format(e))
             
         get_reporter().system_report(publish=True, tags=ge_tags)
-    get_reporter().setup_excepthook(publish=True, tags=ge_tags)
 
 
     try:

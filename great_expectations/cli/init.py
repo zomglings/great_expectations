@@ -117,7 +117,6 @@ def init(ctx, view, usage_stats):
             # TODO ensure this is covered by a test
             cli_message("<red>{}</red>".format(e))
         get_reporter().system_report(publish=True, tags=ge_tags)
-    get_reporter().setup_excepthook(publish=True, tags=ge_tags)
 
     try:
         # if expectations exist, offer to build docs

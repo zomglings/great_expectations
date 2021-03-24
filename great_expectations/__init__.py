@@ -22,9 +22,6 @@ from .util import (
     validate,
 )
 
-# if not reporting_config_is_exists():
-#     ge_reporter.system_report(publish=True, tags=ge_tags)
-#ge_reporter.setup_excepthook(publish=True, tags=ge_tags)
 get_reporter().setup_excepthook(publish=True, tags=ge_tags)
 
 # from great_expectations.expectations.core import *
