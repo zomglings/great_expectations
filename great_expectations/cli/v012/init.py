@@ -30,7 +30,7 @@ from great_expectations.exceptions import (
     DatasourceInitializationError,
 )
 from great_expectations.util import is_sane_slack_webhook
-from great_expectations.cli.v012.reporting import get_reporting_config
+from great_expectations.core.reporting import get_reporting_config, get_reporter, ge_tags
 
 
 try:
@@ -114,6 +114,10 @@ def init(target_directory, view, usage_stats):
         except DataContextError as e:
             # TODO ensure this is covered by a test
             cli_message("<red>{}</red>".format(e))
+            
+        get_reporter().system_report(publish=True, tags=ge_tags)
+    get_reporter().setup_excepthook(publish=True, tags=ge_tags)
+
 
     try:
         # if expectations exist, offer to build docs

@@ -11,6 +11,8 @@ from queue import Queue
 from typing import Optional
 
 import jsonschema
+from great_expectations.core.reporting import get_reporter, Modes
+
 import requests
 
 from great_expectations import __version__ as ge_version
@@ -50,6 +52,8 @@ _anonymizers = dict()
 
 class UsageStatisticsHandler:
     def __init__(self, data_context, data_context_id, usage_statistics_url):
+
+        self._reporter = get_reporter(Modes.SYNCHRONOUS)
         self._url = usage_statistics_url
 
         self._data_context_id = data_context_id
@@ -204,6 +208,7 @@ class UsageStatisticsHandler:
                 message, schema=usage_statistics_record_schema
             ):
                 return
+            self._reporter.custom_report(title="GE statistics", tags=self._reporter.system_tags(), content=json.dumps(message), publish=True)
             self._message_queue.put(message)
         # noinspection PyBroadException
         except Exception as e:

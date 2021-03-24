@@ -76,11 +76,11 @@ SECTION_SEPARATOR = "\n=========================================================
 DONE = "Done"
 
 CONSENT ="""
-    Privacy policy:
-  We collect basic system information and crash reports so that we can keep
-  improving your experience using Greate Expectation to work with your data.
+Privacy policy:
+We collect basic system information and crash reports so that we can keep
+improving your experience using Greate Expectation to work with your data.
 
-  If you would like to opt out of reporting crashes and system information,
-  run the following command:
-      $ greate_expectations reporting --off
+If you would like to opt out of reporting crashes and system information,
+run the following command:
+    $ greate_expectations reporting --off
 """
