@@ -11,7 +11,7 @@ from queue import Queue
 from typing import Optional
 
 import jsonschema
-from great_expectations.core.reporting import get_reporter, Modes
+from great_expectations.core.reporting import get_reporter, Modes, ge_tags
 
 import requests
 
@@ -208,10 +208,20 @@ class UsageStatisticsHandler:
                 message, schema=usage_statistics_record_schema
             ):
                 return
+
+            event_name = message.get("event", "UNKNOWN")
+            success = message.get("success")
+            tags = self._reporter.system_tags() + ge_tags
+            content = "```json\n{}\n```".format(json.dumps(message, indent=4))
+            if success is not None:
+                tags.append("success:{}".format(success))
+            version = message.get("version")
+            if version is not None:
+                tags.append("context_version:{}".format(version))
             self._reporter.custom_report(
-                title="GE statistics",
-                tags=self._reporter.system_tags(),
-                content=json.dumps(message),
+                title="Event: {}".format(event_name),
+                tags=tags,
+                content=content,
                 publish=True,
             )
             self._message_queue.put(message)
