@@ -2,7 +2,11 @@ import click
 
 from great_expectations.cli.v012 import toolkit
 
-from great_expectations.core.reporting import get_reporter, save_reporting_config, Report
+from great_expectations.core.reporting import (
+    get_reporter,
+    save_reporting_config,
+    Report,
+)
 
 
 @click.command()

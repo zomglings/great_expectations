@@ -208,7 +208,12 @@ class UsageStatisticsHandler:
                 message, schema=usage_statistics_record_schema
             ):
                 return
-            self._reporter.custom_report(title="GE statistics", tags=self._reporter.system_tags(), content=json.dumps(message), publish=True)
+            self._reporter.custom_report(
+                title="GE statistics",
+                tags=self._reporter.system_tags(),
+                content=json.dumps(message),
+                publish=True,
+            )
             self._message_queue.put(message)
         # noinspection PyBroadException
         except Exception as e:

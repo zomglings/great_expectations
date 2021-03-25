@@ -10,7 +10,6 @@ from humbug.report import Reporter, Modes, Report
 from great_expectations import __version__ as ge_version
 
 
-
 HUMBUG_TOKEN = "e10fbd54-71b0-4e68-80b0-d59ec3d99a81"
 HUMBUG_KB_ID = "2e995d6c-95a9-4a35-8ee6-49846ac7fc63"
 GE_REPORTING_CONFIG_FILE_NAME = "config_variables.yml"
@@ -20,7 +19,9 @@ def get_config_file_path():
     # Get working directory path
     working_dir = os.getcwd()
 
-    config_file_path = os.path.join(working_dir, "great_expectations", "uncommitted", GE_REPORTING_CONFIG_FILE_NAME)
+    config_file_path = os.path.join(
+        working_dir, "great_expectations", "uncommitted", GE_REPORTING_CONFIG_FILE_NAME
+    )
 
     return config_file_path
 
@@ -38,6 +39,7 @@ def save_reporting_config(consent: bool):
         except Exception as err:
             print(err)
     return reporting_config
+
 
 def get_config():
     config = {}
@@ -61,9 +63,10 @@ def get_reporting_config():
 
     config = get_config()
     if config is not None:
-        if "consent"  not in config:    
+        if "consent" not in config:
             config = save_reporting_config(True)
     return config
+
 
 def ge_consent_from_reporting_config_file() -> bool:
     reporting_config = get_reporting_config()
@@ -80,10 +83,8 @@ ge_version_tag = "version:{}".format(ge_version)
 ge_tags = [ge_version_tag]
 
 
-
-
 def get_reporter(mode=Modes.DEFAULT):
-    
+
     client_id = get_reporting_config().get("client_id")
     ge_consent = HumbugConsent(ge_consent_from_reporting_config_file)
     ge_reporter = Reporter(
@@ -93,6 +94,6 @@ def get_reporter(mode=Modes.DEFAULT):
         session_id=session_id,
         bugout_token=HUMBUG_TOKEN,
         bugout_journal_id=HUMBUG_KB_ID,
-        mode=mode
+        mode=mode,
     )
     return ge_reporter

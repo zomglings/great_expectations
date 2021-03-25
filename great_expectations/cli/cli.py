@@ -55,7 +55,7 @@ class CLI(click.MultiCommand):
             "store",
             "suite",
             "validation_operator",
-            "reporting"
+            "reporting",
         ]
 
     def get_command(self, ctx, name):

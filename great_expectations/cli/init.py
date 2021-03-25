@@ -21,7 +21,7 @@ from great_expectations.cli.cli_messages import (
     SLACK_SETUP_INTRO,
     SLACK_SETUP_PROMPT,
     SLACK_WEBHOOK_PROMPT,
-    CONSENT
+    CONSENT,
 )
 from great_expectations.cli.datasource import add_datasource as add_datasource_impl
 from great_expectations.cli.pretty_printing import (
@@ -34,7 +34,11 @@ from great_expectations.exceptions import (
     DatasourceInitializationError,
 )
 from great_expectations.util import is_sane_slack_webhook
-from great_expectations.core.reporting import get_reporting_config, get_reporter, ge_tags
+from great_expectations.core.reporting import (
+    get_reporting_config,
+    get_reporter,
+    ge_tags,
+)
 
 try:
     from sqlalchemy.exc import SQLAlchemyError
@@ -74,10 +78,9 @@ def init(ctx, view, usage_stats):
     target_directory = os.path.abspath(directory)
     ge_dir = _get_full_path_to_ge_dir(target_directory)
     cli_message(GREETING)
-    
+
     reporting_config = get_reporting_config()
-    cli_message(
-        f"{CONSENT}Reporting: {reporting_config.get('consent')}" )
+    cli_message(f"{CONSENT}Reporting: {reporting_config.get('consent')}")
 
     if DataContext.does_config_exist_on_disk(ge_dir):
         try:

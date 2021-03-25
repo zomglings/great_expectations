@@ -75,7 +75,7 @@ SECTION_SEPARATOR = "\n=========================================================
 
 DONE = "Done"
 
-CONSENT ="""
+CONSENT = """
 Privacy policy:
 We collect basic system information and crash reports so that we can keep
 improving your experience using Greate Expectation to work with your data.

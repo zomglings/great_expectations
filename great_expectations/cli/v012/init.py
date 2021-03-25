@@ -20,7 +20,7 @@ from great_expectations.cli.v012.cli_messages import (
     SLACK_SETUP_INTRO,
     SLACK_SETUP_PROMPT,
     SLACK_WEBHOOK_PROMPT,
-    CONSENT
+    CONSENT,
 )
 from great_expectations.cli.v012.datasource import add_datasource as add_datasource_impl
 from great_expectations.cli.v012.docs import build_docs
@@ -30,7 +30,11 @@ from great_expectations.exceptions import (
     DatasourceInitializationError,
 )
 from great_expectations.util import is_sane_slack_webhook
-from great_expectations.core.reporting import get_reporting_config, get_reporter, ge_tags
+from great_expectations.core.reporting import (
+    get_reporting_config,
+    get_reporter,
+    ge_tags,
+)
 
 
 try:
@@ -74,8 +78,7 @@ def init(target_directory, view, usage_stats):
     cli_message(GREETING)
 
     reporting_config = get_reporting_config()
-    cli_message(
-        f"{CONSENT}Reporting: {reporting_config.get('consent')}" )
+    cli_message(f"{CONSENT}Reporting: {reporting_config.get('consent')}")
 
     if DataContext.does_config_exist_on_disk(ge_dir):
         try:
@@ -114,9 +117,8 @@ def init(target_directory, view, usage_stats):
         except DataContextError as e:
             # TODO ensure this is covered by a test
             cli_message("<red>{}</red>".format(e))
-            
-        get_reporter().system_report(publish=True, tags=ge_tags)
 
+        get_reporter().system_report(publish=True, tags=ge_tags)
 
     try:
         # if expectations exist, offer to build docs
