@@ -80,7 +80,6 @@ def init(ctx, view, usage_stats):
     cli_message(GREETING)
 
     reporting_config = get_reporting_config()
-    cli_message(f"{CONSENT}Reporting: {reporting_config.get('consent')}")
 
     if DataContext.does_config_exist_on_disk(ge_dir):
         try:

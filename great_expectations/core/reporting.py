@@ -10,8 +10,8 @@ from humbug.report import Reporter, Modes, Report
 from great_expectations import __version__ as ge_version
 
 
-HUMBUG_TOKEN = "e10fbd54-71b0-4e68-80b0-d59ec3d99a81"
-HUMBUG_KB_ID = "2e995d6c-95a9-4a35-8ee6-49846ac7fc63"
+HUMBUG_KB_ID = "16de7dfb-4e9b-415a-a914-fc4630cdea90"
+HUMBUG_TOKEN = "af8bfdbb-9955-44c7-b53e-30324610cb54"
 GE_REPORTING_CONFIG_FILE_NAME = "config_variables.yml"
 
 
@@ -84,8 +84,7 @@ ge_tags = [ge_version_tag]
 
 
 def get_reporter(mode=Modes.DEFAULT):
-
-    client_id = get_reporting_config().get("client_id")
+    client_id = get_reporting_config().get("instance_id")
     ge_consent = HumbugConsent(ge_consent_from_reporting_config_file)
     ge_reporter = Reporter(
         name="great_expectation",
